@@ -19,31 +19,31 @@ if (isset($_POST['sent'])) {
 
     $user_exist;
     $dates_a=[];
-    if ($_POST['9']) {
-      $value_check = strtolower($_POST['9']);
-      $resu = db_query("SELECT qd.value FROM questionnaire_data AS qd WHERE qd.value='$value_check'");
-      while ($row = $resu->fetch_assoc()) $user_exist = $row['value'];
-      if ($user_exist) {
-        echo '<html>
-          <head>
-            <title>Опрос</title>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-          </head>
-          <body>
-            <div class="container-sm" style="max-width: 500px;">
-              <div class="row" style="font-size: 1.3em; margin: 25px 15px;">';
-          echo "<h3>Извините вы уже выбрали:</h3>";
-        if (isset($_COOKIE['confirm_data'])) {
-          echo $_COOKIE['confirm_data'];          
-        }
-        echo '<a href="index.php">Вернуться к опросу.</a></div></div></body></html>';              
-        exit();
-      }
-    }
+    // if ($_POST['9']) {
+    //   $value_check = strtolower($_POST['9']);
+    //   $resu = db_query("SELECT qd.value FROM questionnaire_data AS qd WHERE qd.value='$value_check'");
+    //   while ($row = $resu->fetch_assoc()) $user_exist = $row['value'];
+      // if ($user_exist) {
+      //   echo '<html>
+      //     <head>
+      //       <title>Опрос</title>
+      //       <meta charset="utf-8">
+      //       <meta name="viewport" content="width=device-width, initial-scale=1">
+      //       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+      //       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+      //       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+      //     </head>
+      //     <body>
+      //       <div class="container-sm" style="max-width: 500px;">
+      //         <div class="row" style="font-size: 1.3em; margin: 25px 15px;">';
+      //     echo "<h3>Извините вы уже выбрали:</h3>";
+      //   if (isset($_COOKIE['confirm_data'])) {
+      //     echo $_COOKIE['confirm_data'];          
+      //   }
+      //   echo '<a href="index.php">Вернуться к опросу.</a></div></div></body></html>';              
+      //   exit();
+      // }
+    // }
     
     foreach ($_POST as $key => $value) {
       if ($value) {
@@ -148,7 +148,8 @@ $comment = $questionnaire[0]['comment'];
   <body>
     <div class="container-sm" style="max-width: 500px;">
       <div class="row" style="font-size: 1.3em; margin: 25px 15px;">
-        <h1 class="mb-3 text-center"><?php echo $questionnaire_name; ?></h1>
+        <h1 class="mb-3 text-center"><?php echo  $questionnaire_name; ?></h1>
+        
         <?php if (!isset($_POST['sent']) && !isset($_GET['stop'])): 
         $ready = false;
         ?>
@@ -181,7 +182,8 @@ $comment = $questionnaire[0]['comment'];
             <label class='form-check-label' for='check{$id_ql}'><b>{$name_ql}</b></label>
             <span class='grey_text'>{$kol_vo}</span>";
           } elseif ($value['type'] === 'in') {
-            if ($ready) {              
+            if ($ready) {            
+              
               echo "<p>{$comment}</p>";
               echo "<div class='mb-2'><input type='text' class='input-google' id='input{$id_ql}' placeholder='{$name_ql}' name='{$id_ql}' {$required} {$disabled}>";
             }            
@@ -193,8 +195,9 @@ $comment = $questionnaire[0]['comment'];
             
           } elseif ($value['type'] === 'he') {
             echo "<div class='mb-2'>
-            <label class='form-check-label'><b>{$name_ql}</b></label>";
+            <label class='form-check-label-name'><b>{$name_ql}</b></label>";
           } ?>
+          
           </div>
         <?php endforeach; ?>
         <input type="hidden" name="sent" value="<?php echo $questionnaire_id; ?>">
@@ -233,8 +236,8 @@ $comment = $questionnaire[0]['comment'];
     $("input").each(function () {
       if ($(this).attr("type") === "checkbox") {
         if ($(this).prop("checked")) {
-          check++;          
-        }
+           check++;          
+        } 
       } else if ($(this).attr("type") === "text") {
         if ($(this).val() && $(this).attr("placeholder") === "Другое") {
           check++;
@@ -253,13 +256,14 @@ $comment = $questionnaire[0]['comment'];
     }
   }
   $("input[type='checkbox']").change(function () {
+    
     check_field_value();
     if ($(this).prop("checked")) {
       $("input[type='checkbox']").prop("disabled", true);
       $(this).prop("disabled", false);
     } else {
       $("input[type='checkbox']").each(function () {
-        console.log($(this).next().next().text());
+        console.log($(this).next().next().text());  
         if ($(this).next().next().text() === "Нужное количество набрано.") {
           $(this).prop("disabled", true);
         } else {
@@ -280,6 +284,8 @@ $comment = $questionnaire[0]['comment'];
   });
 
   $("#input9").parent().prev().addClass("mt-4");
+  console.log('$("#input9").parent().prev().addClass("mt-4");',$("#input9").parent().prev().addClass("mt-4"));
+  
   $("#input9").parent().prev().addClass("mb-1");
   
   </script>
