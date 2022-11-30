@@ -17,35 +17,8 @@ if (isset($_POST['sent'])) {
     // попробовать через filter_input_array
     global $db;
 
-    $user_exist;
-    $dates_a=[];
-    // if ($_POST['9']) {
-    //   $value_check = strtolower($_POST['9']);
-    //   $resu = db_query("SELECT qd.value FROM questionnaire_data AS qd WHERE qd.value='$value_check'");
-    //   while ($row = $resu->fetch_assoc()) $user_exist = $row['value'];
-      // if ($user_exist) {
-      //   echo '<html>
-      //     <head>
-      //       <title>Опрос</title>
-      //       <meta charset="utf-8">
-      //       <meta name="viewport" content="width=device-width, initial-scale=1">
-      //       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-      //       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-      //       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-      //     </head>
-      //     <body>
-      //       <div class="container-sm" style="max-width: 500px;">
-      //         <div class="row" style="font-size: 1.3em; margin: 25px 15px;">';
-      //     echo "<h3>Извините вы уже выбрали:</h3>";
-      //   if (isset($_COOKIE['confirm_data'])) {
-      //     echo $_COOKIE['confirm_data'];          
-      //   }
-      //   echo '<a href="index.php">Вернуться к опросу.</a></div></div></body></html>';              
-      //   exit();
-      // }
-    // }
-    
-    foreach ($_POST as $key => $value) {
+      $dates_a=[];
+      foreach ($_POST as $key => $value) {
       if ($value) {
         $key = $db->real_escape_string($key);
         $value = $db->real_escape_string($value);
@@ -155,11 +128,15 @@ $comment = $questionnaire[0]['comment'];
         ?>
         <p>Поставьте галочку, введите вашу фамилию и имя и нажмите синюю кнопку <b>«ОТПРАВИТЬ»</b>.</p>      
         <form action="index.php" class="was-validated" method="post">
-        <?php foreach ($questionnaire as $key => $value):
+        
+        <?php
+        $selection_category = 0;
+         foreach ($questionnaire as $key => $value):
           $id_ql = $value['ql_id'];
           $value_limits = checkLimits($id_ql);
           $name_ql = $value['ql_name'];
           $required = '';
+          
           if ($value['required'] === 1) {
             $required = 'required';
           }
@@ -177,13 +154,25 @@ $comment = $questionnaire[0]['comment'];
             $kol_vo = "Лимит не установлен.";
           }
 
-          if ($value['type'] === 'ch') {
-            echo "<div class='form-check mb-2'><input type='checkbox' class='form-check-input' id='check{$id_ql}' name='{$id_ql}' value='1' {$required} {$disabled}>
-            <label class='form-check-label' for='check{$id_ql}'><b>{$name_ql}</b></label>
+          if ($value['type'] === 'he') {
+            $selection_category++;
+            echo "<div class='mb-2'>
+            <label class='form-check-label-name'><b>{$name_ql}</b></label>";
+          }
+
+          
+          // Разбил список на две категории
+          if ($value['type'] === 'ch' && $selection_category ===1 ) {
+            echo "<div class='form-check mb-2'><input type='checkbox' class='form-check-input one' id='check{$id_ql}' name='{$id_ql}' data='one' value='1' {$required} {$disabled}>
+            <label class='form-check-label one' for='check{$id_ql}'><b>{$name_ql}</b></label>
+            <span class='grey_text'>{$kol_vo}</span>";
+          } elseif($value['type'] === 'ch' && $selection_category !== 1 )  {
+            echo "<div class='form-check mb-2'><input type='checkbox' class='form-check-input two' id='check{$id_ql}' name='{$id_ql}' data='two' value='1' {$required} {$disabled}>
+            <label class='form-check-label two' for='check{$id_ql}'><b>{$name_ql}</b></label>
             <span class='grey_text'>{$kol_vo}</span>";
           } elseif ($value['type'] === 'in') {
+           
             if ($ready) {            
-              
               echo "<p>{$comment}</p>";
               echo "<div class='mb-2'><input type='text' class='input-google' id='input{$id_ql}' placeholder='{$name_ql}' name='{$id_ql}' {$required} {$disabled}>";
             }            
@@ -193,10 +182,9 @@ $comment = $questionnaire[0]['comment'];
               $ready = true;
             }
             
-          } elseif ($value['type'] === 'he') {
-            echo "<div class='mb-2'>
-            <label class='form-check-label-name'><b>{$name_ql}</b></label>";
-          } ?>
+          } 
+        
+          ?>
           
           </div>
         <?php endforeach; ?>
@@ -255,27 +243,48 @@ $comment = $questionnaire[0]['comment'];
       $("#text_error").text("");
     }
   }
-  $("input[type='checkbox']").change(function () {
-    
+
+  // Событие отслеживается на каждой  группе категорий
+  
+  // гр1
+  $("input[class='form-check-input one']").change(function () {
     check_field_value();
-    if ($(this).prop("checked")) {
-      $("input[type='checkbox']").prop("disabled", true);
+    if (($(this).prop("checked") && $(this).attr("data")==='one') ){
+      $("input[class='form-check-input one']").prop("disabled", true);
       $(this).prop("disabled", false);
     } else {
-      $("input[type='checkbox']").each(function () {
-        console.log($(this).next().next().text());  
+      $("input[class='form-check-input one']").each(function () {
         if ($(this).next().next().text() === "Нужное количество набрано.") {
           $(this).prop("disabled", true);
         } else {
           $(this).prop("disabled", false);
         }
       });
-      //$("input[type='checkbox']").prop("disabled", false);
     }
   });
+
+  
+  //гр2 
+  $("input[class='form-check-input two']").change(function () {
+    check_field_value();
+     if(($(this).prop("checked") && $(this).attr("data")==='two') ){
+      $("input[class='form-check-input two']").prop("disabled", true)
+      $(this).prop("disabled", false);
+    } else {
+      $("input[class='form-check-input two']").each(function () {
+        if ($(this).next().next().text() === "Нужное количество набрано.") {
+          $(this).prop("disabled", true);
+        } else {
+          $(this).prop("disabled", false);
+        }
+      });
+    }
+  });
+  
   $("input[type='text']").keyup(function () {
     check_field_value();
   });
+
     // Проверка при отправки формы на лимит
   $("button[type='submit']").click(function () {
     if ($(this).prop("disabled")) {
@@ -284,7 +293,7 @@ $comment = $questionnaire[0]['comment'];
   });
 
   $("#input9").parent().prev().addClass("mt-4");
-  console.log('$("#input9").parent().prev().addClass("mt-4");',$("#input9").parent().prev().addClass("mt-4"));
+  // console.log('$("#input9").parent().prev().addClass("mt-4");',$("#input9").parent().prev().addClass("mt-4"));
   
   $("#input9").parent().prev().addClass("mb-1");
   
