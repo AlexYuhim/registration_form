@@ -16,9 +16,11 @@ if (isset($_POST['sent'])) {
   function setQuestionnaireAnswer($answers='') {
     // попробовать через filter_input_array
     global $db;
+ 
+   
+    $dates_a=[];
+    foreach ($_POST as $key => $value) {
 
-      $dates_a=[];
-      foreach ($_POST as $key => $value) {
       if ($value) {
         $key = $db->real_escape_string($key);
         $value = $db->real_escape_string($value);
