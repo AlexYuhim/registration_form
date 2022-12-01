@@ -167,17 +167,25 @@ $comment = $questionnaire[0]['comment'];
 
           
           // Разбил список на две категории
+          // создаем поле для солатов
+          if($value['type']==='ch' && $id_ql==='1'){
+             $val='';
+            echo "<input type='text' placeholder='Ввидите наименование салата' class='fild-input-salat visually-hidden'
+             name='{$id_ql}' id='check0'  {$required} {$disabled}></input>";
+          }  
+            // Гр 1
           if ($value['type'] === 'ch' && $selection_category ===1 ) {
             echo "<div class='form-check mb-2'><input type='checkbox' class='form-check-input one' id='check{$id_ql}' name='{$id_ql}' data='one' value='1' {$required} {$disabled}>
             <label class='form-check-label one' for='check{$id_ql}'><b>{$name_ql}</b></label>
             <span class='grey_text'>{$kol_vo}</span>";
+            //гр 2
           } elseif($value['type'] === 'ch' && $selection_category !== 1 )  {
             echo "<div class='form-check mb-2'><input type='checkbox' class='form-check-input two' id='check{$id_ql}' name='{$id_ql}' data='two' value='1' {$required} {$disabled}>
             <label class='form-check-label two' for='check{$id_ql}'><b>{$name_ql}</b></label>
             <span class='grey_text'>{$kol_vo}</span>";
           } elseif ($value['type'] === 'in') {
            
-            if ($ready) {            
+            if ($ready) {             
               echo "<p>{$comment}</p>";
               echo "<div class='mb-2'><input type='text' class='input-google' id='input{$id_ql}' placeholder='{$name_ql}' name='{$id_ql}' {$required} {$disabled}>";
             }            
@@ -186,12 +194,10 @@ $comment = $questionnaire[0]['comment'];
               echo "<div class='mb-2'><input type='text' class='input-google' id='input{$id_ql}' placeholder='{$name_ql}' name='{$id_ql}' {$required} {$disabled}>";
               $ready = true;
             }
-            
           } 
-        
           ?>
-          
           </div>
+
         <?php endforeach; ?>
         <input type="hidden" name="sent" value="<?php echo $questionnaire_id; ?>">
         <?php if ($questionnaire_id): ?>
@@ -249,11 +255,26 @@ $comment = $questionnaire[0]['comment'];
     }
   }
 
-  // Событие отслеживается на каждой  группе категорий
+  // для разделения логики, чекбокс разбили на две гр
+  // событие отслеживается на каждой  группе 
   
-  // гр1
-  $("input[class='form-check-input one']").change(function () {
+  // гр1 ЕДА
+  
+  $("input[class='form-check-input one']").change(function (evt) {
     check_field_value();
+    // отрабатываем поле салат  
+    if($(this).prop("checked") && $(this).attr("name")==='1'){
+      $("input.fild-input-salat").toggleClass('visually-hidden');
+      $("input.fild-input-salat").prop('required',true);
+      $(this).prop("disabled", false);
+    }
+
+    if(!evt.target.checked && $(this).attr("name")==='1'){
+        $("input.fild-input-salat").toggleClass('visually-hidden');
+        $("input.fild-input-salat").val('');
+        $("input.fild-input-salat").prop("required", false);
+      }
+
     if ($(this).prop("checked")){
       $("input[class='form-check-input one']").prop("disabled", true);
       $(this).prop("disabled", false);
@@ -268,8 +289,13 @@ $comment = $questionnaire[0]['comment'];
     }
   });
 
+    // меняем значение velue у салата на введенное значение пользователя
+      $('#check0').keyup(function(){
+      let val = $(this).val();
+      $('#check1').attr('value',val);
+    });
   
-  //гр2 
+  //гр2 Служение
   $("input[class='form-check-input two']").change(function () {
     check_field_value();
      if($(this).prop("checked") ){
@@ -291,7 +317,8 @@ $comment = $questionnaire[0]['comment'];
   });
 
     // Проверка при отправки формы на лимит
-  $("button[type='submit']").click(function () {
+  $("button[type='submit']").click(function (evt) {
+    console.log('evt Submit', evt);
     if ($(this).prop("disabled")) {
       check_field_value();
     }
@@ -299,7 +326,6 @@ $comment = $questionnaire[0]['comment'];
 
   $("#input9").parent().prev().addClass("mt-4");
   // console.log('$("#input9").parent().prev().addClass("mt-4");',$("#input9").parent().prev().addClass("mt-4"));
-  
   $("#input9").parent().prev().addClass("mb-1");
   
   </script>
@@ -333,5 +359,17 @@ $comment = $questionnaire[0]['comment'];
     color: red;
     display: block;
   }
+
+  /** ----------поле ввода салата ------------- */
+  .fild-input-salat{
+    display: block;
+    width: 100%;
+    border-radius: 5px;
+  }
+
+  .visually-hidden{
+    display: none; 
+  }
+
   </style>
 </html>
