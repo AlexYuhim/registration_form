@@ -60,6 +60,9 @@ if (isset($_POST['sent'])) {
     }
 
     $confirm_data = getQuestionnaireByUser($dates_a);    
+
+    $text_comfirme='';
+    
     foreach ($confirm_data as $key => $value) {
       $text_comfirme .= "<h4>{$key} - {$value}</h4>";
     }
