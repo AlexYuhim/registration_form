@@ -16,35 +16,8 @@ if (isset($_POST['sent'])) {
   function setQuestionnaireAnswer($answers='') {
     // попробовать через filter_input_array
     global $db;
-
-    $user_exist;
+   
     $dates_a=[];
-    // if ($_POST['9']) {
-    //   $value_check = strtolower($_POST['9']);
-    //   $resu = db_query("SELECT qd.value FROM questionnaire_data AS qd WHERE qd.value='$value_check'");
-    //   while ($row = $resu->fetch_assoc()) $user_exist = $row['value'];
-      // if ($user_exist) {
-      //   echo '<html>
-      //     <head>
-      //       <title>Опрос</title>
-      //       <meta charset="utf-8">
-      //       <meta name="viewport" content="width=device-width, initial-scale=1">
-      //       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-      //       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-      //       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-      //     </head>
-      //     <body>
-      //       <div class="container-sm" style="max-width: 500px;">
-      //         <div class="row" style="font-size: 1.3em; margin: 25px 15px;">';
-      //     echo "<h3>Извините вы уже выбрали:</h3>";
-      //   if (isset($_COOKIE['confirm_data'])) {
-      //     echo $_COOKIE['confirm_data'];          
-      //   }
-      //   echo '<a href="index.php">Вернуться к опросу.</a></div></div></body></html>';              
-      //   exit();
-      // }
-    // }
-    
     foreach ($_POST as $key => $value) {
       if ($value) {
         $key = $db->real_escape_string($key);
