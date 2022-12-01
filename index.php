@@ -249,7 +249,7 @@ $comment = $questionnaire[0]['comment'];
   // гр1
   $("input[class='form-check-input one']").change(function () {
     check_field_value();
-    if (($(this).prop("checked") && $(this).attr("data")==='one') ){
+    if ($(this).prop("checked")){
       $("input[class='form-check-input one']").prop("disabled", true);
       $(this).prop("disabled", false);
     } else {
@@ -267,7 +267,7 @@ $comment = $questionnaire[0]['comment'];
   //гр2 
   $("input[class='form-check-input two']").change(function () {
     check_field_value();
-     if(($(this).prop("checked") && $(this).attr("data")==='two') ){
+     if($(this).prop("checked") ){
       $("input[class='form-check-input two']").prop("disabled", true)
       $(this).prop("disabled", false);
     } else {
