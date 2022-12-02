@@ -170,7 +170,7 @@ $comment = $questionnaire[0]['comment'];
           // создаем поле для солатов
           if($value['type']==='ch' && $id_ql==='1'){
              $val='';
-            echo "<input type='text' placeholder='Ввидите наименование салата' class='fild-input-salat visually-hidden'
+            echo "<input type='text' placeholder='Введите наименование салата' class='fild-input-salat visually-hidden'
              name='{$id_ql}' id='check0'  {$required} {$disabled}></input>";
           }  
             // Гр 1
@@ -283,7 +283,7 @@ $comment = $questionnaire[0]['comment'];
         if ($(this).next().next().text() === "Нужное количество набрано.") {
           $(this).prop("disabled", true);
         } else {
-          $(this).prop("disabled", false);
+          $(this).prop("disabled", false); 
         }
       });
     }
@@ -317,8 +317,7 @@ $comment = $questionnaire[0]['comment'];
   });
 
     // Проверка при отправки формы на лимит
-  $("button[type='submit']").click(function (evt) {
-    console.log('evt Submit', evt);
+  $("button[type='submit']").click(function () {
     if ($(this).prop("disabled")) {
       check_field_value();
     }
@@ -362,7 +361,7 @@ $comment = $questionnaire[0]['comment'];
 
   /** ----------поле ввода салата ------------- */
   .fild-input-salat{
-    display: block;
+    display: inline-block;
     width: 100%;
     border-radius: 5px;
   }
