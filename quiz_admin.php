@@ -98,6 +98,7 @@ $value_group = getIdTextField($questionnaire_id, true);
           if ($point === 'Ваши фамилия и имя') {
            $point = 'Всего';
           }
+
           if ($point === 'ЕДА' || $point === 'СЛУЖЕНИЕ'  ) {
             echo" <thead>
                     <tr class='table-info'>
@@ -107,6 +108,8 @@ $value_group = getIdTextField($questionnaire_id, true);
                         <th scope='col'></th>
                     </tr>
                   </thead>";
+
+
           } else {
             echo " <tbody > 
                         <tr class='parent'>
