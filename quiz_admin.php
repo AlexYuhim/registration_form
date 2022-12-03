@@ -96,7 +96,7 @@ $value_group = getIdTextField($questionnaire_id, true);
            $point = 'Всего';
           }
           if ($point === 'ЕДА' || $point === 'СЛУЖЕНИЕ') {
-            echo "<p>{$point}</p>"; 
+            echo "<p>{$point}</p>";
           } else {
             echo "<p>{$point}: {$total} чел. {$limits}</p>"; 
           }          
