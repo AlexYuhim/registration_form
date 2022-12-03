@@ -1,4 +1,5 @@
 <?php
+header("Cache-Control:no-store, must-revalidate");
 include_once "config.php";
 
 // получаем количество ответов
@@ -83,25 +84,46 @@ $value_group = getIdTextField($questionnaire_id, true);
     <script src="extensions/jquery_3.6.0/jquery.min.js"></script>-->
   </head>
   <body>
-    <div class="container-sm" style="max-width: 500px;">
+    <div class="container-sm" style="max-width: 550px;">
       <div class="row" style="font-size: 1.3em; margin: 25px 15px;">
         <h1 class="mb-3 text-center"><?php echo $questionnaire_name; ?></h1>
         <h3>По списку</h3>
+        <table class='table table-hover border'> 
+            
         <?php foreach ($questionnaire as $key => $value):
           $point = $value['ql_name'];
           $limits = $value['limits'];
-          $value['limits'] ? $limits = 'из '.$value['limits'].'.' : $limits = '';
+          $value['limits'] ? $limits = $value['limits'] : $limits = '';
           $total = checkLimits($value['ql_id']);
           if ($point === 'Ваши фамилия и имя') {
            $point = 'Всего';
           }
-          if ($point === 'ЕДА' || $point === 'СЛУЖЕНИЕ') {
-            echo "<p>{$point}</p>";
-          } else {
-            echo "<p>{$point}: {$total} чел. {$limits}</p>"; 
-          }          
-          endforeach; ?>
 
+          if ($point === 'ЕДА' || $point === 'СЛУЖЕНИЕ'  ) {
+            echo" <thead>
+                    <tr class='table-info'>
+                        <th scope='col'>{$point}</th>
+                        <th scope='col'>чел</th>
+                        <th scope='col'>из</th>
+                        <th scope='col'></th>
+                    </tr>
+                  </thead>";
+
+
+          } else {
+            echo " <tbody > 
+                        <tr class='parent'>
+                           <td scope ='row' >{$point}:</td>
+                           <td>{$total}</td>
+                           <td class='last'>{$limits}</td>
+                           <td><button id='claer-fild' class='rounded btn btn-outline-info ' type='button'>сброс</button></td>
+                        </tr>
+                     </tbody>
+                          ";
+          }         
+            endforeach; ?>
+            </table>
+ 
           <?php
           $prev_field = '';
           foreach ($value_text as $key => $value):
@@ -132,6 +154,10 @@ $value_group = getIdTextField($questionnaire_id, true);
     </div>
   </body>
   <script>
+    $('#claer-fild').click(()=>{
+      console.log('parent',$('.parent') );
+      
+    })
   $("#clear_data").click(function () {
     if (confirm("Удалить ответы из опроса?")) {
       fetch("quiz_ajax.php?type=delete")
@@ -151,5 +177,8 @@ $value_group = getIdTextField($questionnaire_id, true);
     color: gray;
     display: block;
   }
+    table .razdel{
+      padding-bottom: 10px !important;
+    }
   </style>
 </html>
