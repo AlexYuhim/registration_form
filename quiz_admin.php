@@ -84,7 +84,7 @@ $value_group = getIdTextField($questionnaire_id, true);
     <script src="extensions/jquery_3.6.0/jquery.min.js"></script>-->
   </head>
   <body>
-    <div class="container-sm" style="max-width: 550px;">
+    <div class="container-sm" style="max-width: 500px;">
       <div class="row" style="font-size: 1.3em; margin: 25px 15px;">
         <h1 class="mb-3 text-center"><?php echo $questionnaire_name; ?></h1>
         <h3>По списку</h3>
@@ -105,52 +105,83 @@ $value_group = getIdTextField($questionnaire_id, true);
                         <th scope='col'>{$point}</th>
                         <th scope='col'>чел</th>
                         <th scope='col'>из</th>
-                        <th scope='col'></th>
                     </tr>
                   </thead>";
 
 
           } else {
-            echo " <tbody > 
-                        <tr class='parent'>
+            echo " <tbody> 
+                        <tr>
                            <td scope ='row' >{$point}:</td>
                            <td>{$total}</td>
                            <td class='last'>{$limits}</td>
-                           <td><button id='claer-fild' class='rounded btn btn-outline-info ' type='button'>сброс</button></td>
                         </tr>
                      </tbody>
                           ";
           }         
-            endforeach; ?>
+            endforeach; 
+            
+        ?>
             </table>
  
-          <?php
+        <table class='table table-hover border'>            
+        <?php
+
           $prev_field = '';
           foreach ($value_text as $key => $value):
           $field = $value[3];
           $value_text = $value[1];
           if ($prev_field !== $field && $field !== 'Ваши фамилия и имя') {
-            echo  "<h3>{$field}</h3>";
+              echo  "<thead>
+                      <tr class='table-info'>
+                        <th class='mw-50'>{$field}</th>
+                      </tr>
+
+                    </thead>";
           }
           if ($field !== 'Ваши фамилия и имя') {
-           echo "<p>{$value_text}</p>"; 
+              echo "<tbody> 
+                      <tr>
+                        <td scope ='row'>{$value_text}</td>
+                      </tr>
+                   </tbody>";
           }          
           $prev_field = $field;
           endforeach;
-          echo  "<h3>Кто? Что?</h3>";
+
+          echo"<thead >
+                <tr class='table-info'>
+                  <th>Кто? Что?</th>
+                </tr>
+              </thead>";
+
           foreach ($value_group as $key => $value) {
-            echo '<div> <span>'.$value['Ваши фамилия и имя'].': </span>';
+            echo "<tbody> 
+                      <tr class='table-warning'>
+                        <td scope ='row'>{$value['Ваши фамилия и имя']}:</td>
+                      </tr>
+                  </tbody>";
              
             foreach ($value as $key2 => $value2) {
               if ($key2 !== 'Ваши фамилия и имя') {
-                echo '<span> '.$key2.' - '.$value2.'; </span>'; 
+                echo "<tbody> 
+                          <tr class='text-break'>
+                            <td scope ='row'> $key2 - $value2</td>
+                           </tr>
+                      </tbody>";
               }              
             }
-            echo '</div><hr>';
-          }          
-          ?>
+          }   
+        ?>
+         </table>        
       </div>
-      <button id="clear_data" class="btn btn-danger mb-4" style="margin-left: 110px;" type="button" name="button">Очистить форму</button>
+
+      <div style="display: flex; justify-content: space-around; align-items: center;">
+        <button type='button' name="button" class='btn btn-primary mb-4 g-2 p-2'>Редактировать</button>
+        <button id="clear_data" class="btn btn-danger mb-4 g-2 p-2" type="button" name="button">Очистить форму</button>
+      </div>
+      
+      
     </div>
   </body>
   <script>
@@ -177,8 +208,5 @@ $value_group = getIdTextField($questionnaire_id, true);
     color: gray;
     display: block;
   }
-    table .razdel{
-      padding-bottom: 10px !important;
-    }
-  </style>
+    </style>
 </html>
