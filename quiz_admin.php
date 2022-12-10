@@ -1,5 +1,7 @@
 <?php
 header("Cache-Control:no-store, must-revalidate");
+// header('Refresh: 10');
+
 include_once "config.php";
 
 // получаем количество ответов
@@ -69,6 +71,7 @@ $header_text = $questionnaire[0]['header'];
 $comment = $questionnaire[0]['comment'];
 $value_text = getIdTextField($questionnaire_id);
 $value_group = getIdTextField($questionnaire_id, true);
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -88,17 +91,17 @@ $value_group = getIdTextField($questionnaire_id, true);
       <div class="row" style="font-size: 1.3em; margin: 25px 15px;">
         <h1 class="mb-3 text-center"><?php echo $questionnaire_name; ?></h1>
         <h3>По списку</h3>
+
         <table class='table table-hover border'> 
-            
         <?php foreach ($questionnaire as $key => $value):
           $point = $value['ql_name'];
           $limits = $value['limits'];
           $value['limits'] ? $limits = $value['limits'] : $limits = '';
           $total = checkLimits($value['ql_id']);
+
           if ($point === 'Ваши фамилия и имя') {
            $point = 'Всего';
           }
-
           if ($point === 'ЕДА' || $point === 'СЛУЖЕНИЕ'  ) {
             echo" <thead>
                     <tr class='table-info'>
@@ -107,8 +110,6 @@ $value_group = getIdTextField($questionnaire_id, true);
                         <th scope='col'>из</th>
                     </tr>
                   </thead>";
-
-
           } else {
             echo " <tbody> 
                         <tr>
@@ -120,13 +121,11 @@ $value_group = getIdTextField($questionnaire_id, true);
                           ";
           }         
             endforeach; 
-            
         ?>
-            </table>
+      </table>
  
-        <table class='table table-hover border'>            
+      <table class='table table-hover border'>            
         <?php
-
           $prev_field = '';
           foreach ($value_text as $key => $value):
           $field = $value[3];
@@ -136,7 +135,6 @@ $value_group = getIdTextField($questionnaire_id, true);
                       <tr class='table-info'>
                         <th class='mw-50'>{$field}</th>
                       </tr>
-
                     </thead>";
           }
           if ($field !== 'Ваши фамилия и имя') {
@@ -165,9 +163,9 @@ $value_group = getIdTextField($questionnaire_id, true);
             foreach ($value as $key2 => $value2) {
               if ($key2 !== 'Ваши фамилия и имя') {
                 echo "<tbody> 
-                          <tr class='text-break'>
-                            <td scope ='row'> $key2 - $value2</td>
-                           </tr>
+                        <tr class='text-break'>
+                          <td scope ='row'> $key2 - $value2</td>
+                        </tr>
                       </tbody>";
               }              
             }
@@ -177,20 +175,94 @@ $value_group = getIdTextField($questionnaire_id, true);
       </div>
 
       <div style="display: flex; justify-content: space-around; align-items: center;">
-        <button type='button' name="button" class='btn btn-primary mb-4 g-2 p-2'>Редактировать</button>
-        <button id="clear_data" class="btn btn-danger mb-4 g-2 p-2" type="button" name="button">Очистить форму</button>
+        <button type='button' class='btn btn-primary mb-4'data-bs-toggle="modal" data-bs-target="#exampleModal">Редактировать</button>
+
+        <button  type="button" class="btn btn-danger mb-4" name="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+         Очистить форму
+        </button>
       </div>
-      
-      
     </div>
-  </body>
-  <script>
-    $('#claer-fild').click(()=>{
-      console.log('parent',$('.parent') );
-      
-    })
-  $("#clear_data").click(function () {
-    if (confirm("Удалить ответы из опроса?")) {
+
+
+      <!-- Modal Редактировать-->
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
+            </div>
+            <div class="modal-body">
+              <table class='table table-hover border'>            
+              <?php
+                foreach ($value_group as $key => $value) {
+                  echo"<thead >
+                        <tr class='table-info'>
+                          <th>Кто? Что?</th>
+                        </tr>
+                      </thead>";
+                  echo "<tbody> 
+                            <tr class='table-warning'>
+                              <td scope ='row'>{$value['Ваши фамилия и имя']}:</td>
+                            </tr>
+                        </tbody>";
+                  
+                  foreach ($value as $key2 => $value2) {
+                    if ($key2 !== 'Ваши фамилия и имя') {
+                      echo "<tbody> 
+                                <tr class='text-break'>
+                                  <td scope ='row'>
+                                    <form metod='POST'action='#'>
+                                    <input type='text' name='value_input' style='width: 300px;' value=' $key2 - $value2'>
+                                    </form> 
+                                  </td>
+                                </tr>
+                            </tbody>";
+                    }
+                  }
+                   echo "<tbody> 
+                      <tr>
+                        <td><button type='submit' class='btn btn-primary'>Изминить</button></td>
+                      </tr>
+                  </tbody>";
+                }   
+              ?>
+              </table>     
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+     
+        <!-- Modal Очистить форму-->
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">УДАЛЕНИЕ ДАННЫХ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Удалить содержимое формы? 
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">НЕТ</button>
+                <button id="clear_data" type="button" class="btn btn-primary">ДА</button>
+              </div>
+            </div>
+          </div>
+        </div>
+ 
+</body>
+
+<script>
+    
+  $("#clear_data").click(function (evt) {
+    if (evt) {
       fetch("quiz_ajax.php?type=delete")
       .then(response => response.text())
       .then(commits => {
@@ -201,6 +273,8 @@ $value_group = getIdTextField($questionnaire_id, true);
       });
     }
   });
+
+  
   </script>
   <style>
   .grey_text {

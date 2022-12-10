@@ -132,7 +132,7 @@ $comment = $questionnaire[0]['comment'];
         $ready = false;
         ?>
         <p>Поставьте галочку, введите вашу фамилию и имя и нажмите синюю кнопку <b>«ОТПРАВИТЬ»</b>.</p>      
-        <form action="index.php" class="was-validated" method="post">
+      <form action="index.php" class="was-validated" method="post">
         
         <?php
         $selection_category = 0;
@@ -199,7 +199,7 @@ $comment = $questionnaire[0]['comment'];
           </div>
 
         <?php endforeach; ?>
-        <input type="hidden" name="sent" value="<?php echo $questionnaire_id; ?>">
+        <input type="hidden" name="sent" value="<?php echo  $questionnaire_id; ?>">
         <?php if ($questionnaire_id): ?>
         <span id="text_error">Выберите блюда и введите вашу фамилию и имя.</span>
         <button type="submit" class="btn btn-primary btn-lg mt-3" disabled><b>ОТПРАВИТЬ</b></button>
