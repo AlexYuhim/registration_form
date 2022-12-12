@@ -6,7 +6,7 @@ function checkLimits($id) {
     global $db;
     $id = $db->real_escape_string($id);
     $result = '';
-    $res = db_query("SELECT COUNT(`id_list`) AS count_id FROM questionnaire_data WHERE `id_list`='$id'");
+    $res = db_query("SELECT COUNT(`id_blank`) AS count_id FROM questionnaire_data WHERE `id_blank`='$id'");
     while ($row = $res->fetch_assoc()) $result = $row['count_id'];
     return $result;
 }
@@ -33,7 +33,7 @@ if (isset($_POST['sent'])) {
           if ($limits) {
             $value = strtolower($value);
             if ($limits > 0 && $value_exist < $limits) {
-              $insert = db_query("INSERT INTO questionnaire_data (`id_list`, `value`) VALUES ('$key', '$value')");
+              $insert = db_query("INSERT INTO questionnaire_data (`id_blank`, `value`) VALUES ('$key', '$value')");
               $dates_a[] = $db->insert_id;
             } else {
               echo '<html>
@@ -53,7 +53,7 @@ if (isset($_POST['sent'])) {
               exit();
             }
           } else {
-            $insert = db_query("INSERT INTO questionnaire_data (`id_list`, `value`) VALUES ('$key', '$value')");
+            $insert = db_query("INSERT INTO questionnaire_data (`id_blank`, `value`) VALUES ('$key', '$value')");
             $dates_a[] = $db->insert_id;
           }          
         }
@@ -78,9 +78,9 @@ function getQuestionnaire() {
     $result = [];
     $condition = '1';    
     $res = db_query("SELECT q.id, q.name, q.header, q.comment,
-      ql.id AS ql_id, ql.id_blank, ql.name AS ql_name, ql.type, ql.sort, ql.limits, ql.required
+      ql.id AS ql_id, ql.id_list, ql.name AS ql_name, ql.type, ql.sort, ql.limits, ql.required
       FROM questionnaire AS q
-      INNER JOIN questionnaire_list ql ON ql.id_blank = q.id
+      INNER JOIN questionnaire_list ql ON ql.id_list = q.id
       WHERE $condition ORDER BY ql.sort");
     while ($row = $res->fetch_assoc()) $result[] = $row;
     return $result;
@@ -97,10 +97,10 @@ function getQuestionnaireByUser($dates=[]) {
       $condition .= " qd.id={$value} ";
     }    
 
-    $res = db_query("SELECT qd.id, qd.id_list, qd.value, qd.date,
-      ql.id, ql.id_blank, ql.name
+    $res = db_query("SELECT qd.id, qd.id_blank, qd.value, qd.date,
+      ql.id, ql.id_list, ql.name
       FROM questionnaire_data AS qd
-      INNER JOIN questionnaire_list ql ON ql.id = qd.id_list
+      INNER JOIN questionnaire_list ql ON ql.id = qd.id_blank
       WHERE $condition ORDER BY ql.id DESC");
     while ($row = $res->fetch_assoc()) $result[$row['name']] = $row['value'];
     return $result;
@@ -262,7 +262,7 @@ $comment = $questionnaire[0]['comment'];
   
   $("input[class='form-check-input one']").change(function (evt) {
     check_field_value();
-    // отрабатываем поле салат  
+    // обрабатываем поле салат, выводим или скрываем поле input 
     if($(this).prop("checked") && $(this).attr("name")==='1'){
       $("input.fild-input-salat").toggleClass('visually-hidden');
       $("input.fild-input-salat").prop('required',true);
@@ -291,6 +291,7 @@ $comment = $questionnaire[0]['comment'];
 
     // меняем значение velue у салата на введенное значение пользователя
       $('#check0').keyup(function(){
+        
       let val = $(this).val();
       $('#check1').attr('value',val);
     });
