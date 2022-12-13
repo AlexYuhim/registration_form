@@ -1,14 +1,6 @@
 <?php
 header("Cache-Control:no-store, must-revalidate");
-// header('Refresh: 10');
-/*    ?>
-   <pre>
-    <?php
-   var_dump($result);
-   ?>
-  </pre>
-  <?php
- */
+
 include_once "config.php";
 
 // получаем количество ответов
@@ -16,7 +8,7 @@ function checkLimits($id) {
     global $db;
     $id = $db->real_escape_string($id);
     $result = [];
-    $res = db_query("SELECT COUNT(`id_blank`) AS count_id FROM questionnaire_data WHERE `id_blank`='$id'");
+    $res = db_query("SELECT COUNT(`id_list`) AS count_id FROM questionnaire_data WHERE `id_list`='$id'");
     while ($row = $res->fetch_assoc()) $result = $row['count_id'];
     return $result;
     
@@ -40,9 +32,9 @@ function idQuestionnaire_data($id) {
 function getQuestionnaire() {
     $result = [];
     $res = db_query("SELECT q.id, q.name, q.header, q.comment,
-      ql.id AS ql_id, ql.id_list, ql.name AS ql_name, ql.type, ql.sort, ql.limits, ql.required
+      ql.id AS ql_id, ql.id_blank, ql.name AS ql_name, ql.type, ql.sort, ql.limits, ql.required
       FROM questionnaire AS q
-      INNER JOIN questionnaire_list ql ON ql.id_list = q.id
+      INNER JOIN questionnaire_list ql ON ql.id_blank = q.id
       WHERE 1 ORDER BY ql.sort");
     while ($row = $res->fetch_assoc()) $result[] = $row;
     return $result;
@@ -55,26 +47,26 @@ function getIdTextField($id, $group=false) {
   $result = []; 
   $result2 = [];
   $values = [];
-  $res = db_query("SELECT `id`, `id_list`, `name` FROM questionnaire_list WHERE `id_list` = '$id' AND `type` = 'in' ORDER BY `id`");
+  $res = db_query("SELECT `id`, `id_blank`, `name` FROM questionnaire_list WHERE `id_blank` = '$id' AND `type` = 'in' ORDER BY `id`");
     
   while ($row = $res->fetch_assoc()) $result[$row['id']] = $row['name'];
 
   
 
   if ($group) {
-   $res3 = db_query("SELECT `id`, `id_list`, `name` FROM questionnaire_list WHERE `id_list` = '$id' AND `type` = 'ch' ORDER BY `id`");
+   $res3 = db_query("SELECT `id`, `id_blank`, `name` FROM questionnaire_list WHERE `id_blank` = '$id' AND `type` = 'ch' ORDER BY `id`");
   while ($row = $res3->fetch_assoc()) $result2[$row['id']] = $row['name'];
   }  
 
   if (count($result) > 0) {
     foreach ($result as $key => $value) {
       if ($group) {
-        $res2 = db_query("SELECT  qd.id_blank, qd.value, qd.date FROM questionnaire_data AS qd WHERE qd.id_blank = '$key'");
+        $res2 = db_query("SELECT  qd.id_list, qd.value, qd.date FROM questionnaire_data AS qd WHERE qd.id_list = '$key'");
         while ($row = $res2->fetch_assoc()) $values[$row['date']][$value] = $row['value'];
 
       } else {
-        $res2 = db_query("SELECT `id`, `id_blank`, `value`, `date`  FROM questionnaire_data WHERE `id_blank` = '$key'");
-        while ($row = $res2->fetch_assoc()) $values[] = [  $row['id_blank'], $row['value'], $row['date'], $value, $row['id']];
+        $res2 = db_query("SELECT `id`, `id_list`, `value`, `date`  FROM questionnaire_data WHERE `id_list` = '$key'");
+        while ($row = $res2->fetch_assoc()) $values[] = [  $row['id_list'], $row['value'], $row['date'], $value, $row['id']];
       }      
     }
   }
@@ -84,7 +76,7 @@ function getIdTextField($id, $group=false) {
   if ($group) {
     if (count($result2) > 0) {
       foreach ($result2 as $key => $value) {
-        $res4 = db_query("SELECT qd.id, qd.id_blank, qd.value, qd.date FROM questionnaire_data AS qd WHERE qd.id_blank = '$key'");
+        $res4 = db_query("SELECT qd.id, qd.id_list, qd.value, qd.date FROM questionnaire_data AS qd WHERE qd.id_list = '$key'");
         while ($row = $res4->fetch_assoc()) $values[$row['date']][$value] = $row['value'];
        
       }
@@ -220,7 +212,7 @@ $id
                           space-between; 
                           align-items: center;' 
                           scope ='row' > $key2 : $value2  <p  class='visually-hidden'>$key</p>  
-                          <button  type='button' class='btn-close delete_field'></button>
+                          <!--<button  type='button' class='btn-close delete_field'></button>-->
                           
                           </td>
                           
@@ -239,7 +231,8 @@ $id
       </div>
 
       <div style="display: flex; justify-content: space-around; align-items: center;">
-        <button type='button' class='btn btn-primary mb-4'data-bs-toggle="modal" data-bs-target="#exampleModal">Редактировать</button>
+        <!-- <button type='button' class='btn btn-primary mb-4'data-bs-toggle="modal" data-bs-target="#exampleModal">Редактировать</button> -->
+        <button type='button' class='btn btn-primary mb-4'id='updateDate'>Обновить данные</button>
 
         <button  type="button" class="btn btn-danger mb-4" name="button" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
          Очистить форму
@@ -327,7 +320,6 @@ $id
 <?php
 $forIdBlank='';
 
-var_dump($_GET);
 ?>
 
 <script>
@@ -345,35 +337,32 @@ var_dump($_GET);
     }
   });
 
+  $('#updateDate').click((evt)=>{
+    if(evt)location.reload()
+  })
   
-  
-  $(".delete_field").click(function (evt) {
-
-    
-    
-       
-    const getParentButton = $(evt.currentTarget).parent();
-        
-    const getText = getParentButton[0].innerText;
-     $forIdBlank = getText.split(':').splice(0,1).join('');
-    const forDate = getText.split('\n\n').splice(-1).join('').trim();
+  // $(".delete_field").click(function (evt) {
+  //   const getParentButton = $(evt.currentTarget).parent();
+  //   const getText = getParentButton[0].innerText;
+  //    $forIdBlank = getText.split(':').splice(0,1).join('');
+  //   const forDate = getText.split('\n\n').splice(-1).join('').trim();
      
-    console.log('botton',$forIdBlank);
-    console.log('botton',forDate);
+  //   // console.log('botton',$forIdBlank);
+  //   // console.log('botton',forDate);
     
-    if (evt) {
-      fetch(`quiz_ajax.php?type=delete&date=${forDate}`).then(
-        response => response.text())
-      .then(commits => {
-        console.log('forDate',forDate);
+  //   if (evt) {
+  //     fetch(`quiz_ajax.php?type=delete&date=${forDate}`).then(
+  //       response => response.text())
+  //     .then(commits => {
+  //       console.log('forDate',forDate);
         
-		  // location.reload();
-        /*if (commits) {			
+	// 	  // location.reload();
+  //       /*if (commits) {			
           
-        }*/
-      });
-         }
-      });
+  //       }*/
+  //     });
+  //        }
+  //     });
   </script>
  
 
