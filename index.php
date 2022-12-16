@@ -5,8 +5,8 @@ include_once "config.php";
 function checkLimits($id) {
     global $db;
     $id = $db->real_escape_string($id);
-    $result = '';
-    $res = db_query("SELECT COUNT(`id_blank`) AS count_id FROM questionnaire_data WHERE `id_blank`='$id'");
+    $result = ''; 
+    $res = db_query("SELECT COUNT(`id_list`) AS count_id FROM questionnaire_data WHERE `id_list`='$id'");
     while ($row = $res->fetch_assoc()) $result = $row['count_id'];
     return $result;
 }
@@ -33,7 +33,7 @@ if (isset($_POST['sent'])) {
           if ($limits) {
             $value = strtolower($value);
             if ($limits > 0 && $value_exist < $limits) {
-              $insert = db_query("INSERT INTO questionnaire_data (`id_blank`, `value`) VALUES ('$key', '$value')");
+              $insert = db_query("INSERT INTO questionnaire_data (`id_list`, `value`) VALUES ('$key', '$value')");
               $dates_a[] = $db->insert_id;
             } else {
               echo '<html>
@@ -45,15 +45,16 @@ if (isset($_POST['sent'])) {
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
                 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
               </head>
-              <body>
+              <body >
                 <div class="container-sm" style="max-width: 500px;">
                   <div class="row" style="font-size: 1.3em; margin: 25px 15px;">';
               echo "<h3>Лимит исчерпан, попытайтесь заполнить <a href='index.php'>ещё раз</a>.</h3>";
               echo '<a href="index.php">Вернуться к опросу.</a></div></div></body></html>';              
+              
               exit();
             }
           } else {
-            $insert = db_query("INSERT INTO questionnaire_data (`id_blank`, `value`) VALUES ('$key', '$value')");
+            $insert = db_query("INSERT INTO questionnaire_data (`id_list`, `value`) VALUES ('$key', '$value')");
             $dates_a[] = $db->insert_id;
           }          
         }
@@ -78,9 +79,9 @@ function getQuestionnaire() {
     $result = [];
     $condition = '1';    
     $res = db_query("SELECT q.id, q.name, q.header, q.comment,
-      ql.id AS ql_id, ql.id_list, ql.name AS ql_name, ql.type, ql.sort, ql.limits, ql.required
+      ql.id AS ql_id, ql.id_blank, ql.name AS ql_name, ql.type, ql.sort, ql.limits, ql.required
       FROM questionnaire AS q
-      INNER JOIN questionnaire_list ql ON ql.id_list = q.id
+      INNER JOIN questionnaire_list ql ON ql.id_blank = q.id
       WHERE $condition ORDER BY ql.sort");
     while ($row = $res->fetch_assoc()) $result[] = $row;
     return $result;
@@ -97,10 +98,10 @@ function getQuestionnaireByUser($dates=[]) {
       $condition .= " qd.id={$value} ";
     }    
 
-    $res = db_query("SELECT qd.id, qd.id_blank, qd.value, qd.date,
-      ql.id, ql.id_list, ql.name
+    $res = db_query("SELECT qd.id, qd.id_list, qd.value, qd.date,
+      ql.id, ql.id_blank, ql.name
       FROM questionnaire_data AS qd
-      INNER JOIN questionnaire_list ql ON ql.id = qd.id_blank
+      INNER JOIN questionnaire_list ql ON ql.id = qd.id_list
       WHERE $condition ORDER BY ql.id DESC");
     while ($row = $res->fetch_assoc()) $result[$row['name']] = $row['value'];
     return $result;
@@ -114,17 +115,19 @@ $comment = $questionnaire[0]['comment'];
 ?>
 <!DOCTYPE html>
 <html>
-  <head>
+  
     <title>Опрос</title>
     <meta name="description" content="Пир любви. Анкета.">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+              
+
   </head>
-  <body>
-    <div class="container-sm" style="max-width: 500px;">
+  <body  class="d-flex h-100 justify-content-center text-secondary bg-info">
+    <div class="container-sm mt-4 bg-light border rounded " style="max-width: 500px;">
       <div class="row" style="font-size: 1.3em; margin: 25px 15px;">
         <h1 class="mb-3 text-center"><?php echo  $questionnaire_name; ?></h1>
         
@@ -132,7 +135,7 @@ $comment = $questionnaire[0]['comment'];
         $ready = false;
         ?>
         <p>Поставьте галочку, введите вашу фамилию и имя и нажмите синюю кнопку <b>«ОТПРАВИТЬ»</b>.</p>      
-      <form action="index.php" class="was-validated" method="post">
+        <form action="index.php" class="was-validated" method="post">
         
         <?php
         $selection_category = 0;
@@ -170,7 +173,7 @@ $comment = $questionnaire[0]['comment'];
           // создаем поле для солатов
           if($value['type']==='ch' && $id_ql==='1'){
              $val='';
-            echo "<input type='text' placeholder='Введите наименование салата' class='fild-input-salat visually-hidden'
+            echo "<input type='text'  placeholder='Введите наименование салата' class='fild-input-salat visually-hidden'
              name='{$id_ql}' id='check0'  {$required} {$disabled}></input>";
           }  
             // Гр 1
@@ -199,7 +202,7 @@ $comment = $questionnaire[0]['comment'];
           </div>
 
         <?php endforeach; ?>
-        <input type="hidden" name="sent" value="<?php echo  $questionnaire_id; ?>">
+        <input type="hidden" name="sent" value="<?php echo $questionnaire_id; ?>">
         <?php if ($questionnaire_id): ?>
         <span id="text_error">Выберите блюда и введите вашу фамилию и имя.</span>
         <button type="submit" class="btn btn-primary btn-lg mt-3" disabled><b>ОТПРАВИТЬ</b></button>
@@ -207,7 +210,7 @@ $comment = $questionnaire[0]['comment'];
       </form>
       <?php endif; ?>
       <?php if (isset($_POST['sent'])): ?>
-        <h3>Подождите <span class="spinner-border spinner-border-sm"></span></h3>
+        <h3 style='height: 100vh;'>Подождите <span class="spinner-border spinner-border-sm"></span></h3>
         <script>
         let text_comfirme = '<?php echo $text_comfirme; ?>';        
         document.cookie = "confirm_data="+text_comfirme+"; max-age=2592000";        
@@ -217,16 +220,20 @@ $comment = $questionnaire[0]['comment'];
         </script>
       <?php endif; ?>
       <?php if (isset($_GET['stop'])):?>
-        <h3>Вы выбрали:</h3>
-        <?php        
-        if(isset($_COOKIE['confirm_data'])) {
-          echo $_COOKIE['confirm_data'];
-        }        
-        ?>
-        <h4>Спасибо</h4>
-        <h6><a href="index.php">Вернуться к опросу.</h6>
+        <div style='height: 100vh;'>
+            <h3>Вы выбрали:</h3>
+            <?php        
+            if(isset($_COOKIE['confirm_data'])) {
+              echo $_COOKIE['confirm_data'];
+            }        
+            ?>
+            <h4>Спасибо</h4>
+            <h6><a href="index.php">Вернуться к опросу.</h6>
+            <h6><a href="main.html">Вернуться на главную страницу.</h6>
+        </div>
       <?php endif; ?>
       </div>
+    </div>
     </div>
   </body>
   <script>
@@ -262,9 +269,10 @@ $comment = $questionnaire[0]['comment'];
   
   $("input[class='form-check-input one']").change(function (evt) {
     check_field_value();
-    // обрабатываем поле салат, выводим или скрываем поле input 
+    // отрабатываем поле салат  
     if($(this).prop("checked") && $(this).attr("name")==='1'){
       $("input.fild-input-salat").toggleClass('visually-hidden');
+      $("input.fild-input-salat").focus();
       $("input.fild-input-salat").prop('required',true);
       $(this).prop("disabled", false);
     }
@@ -291,7 +299,6 @@ $comment = $questionnaire[0]['comment'];
 
     // меняем значение velue у салата на введенное значение пользователя
       $('#check0').keyup(function(){
-        
       let val = $(this).val();
       $('#check1').attr('value',val);
     });
