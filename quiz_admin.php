@@ -29,9 +29,9 @@ function checkLimits($id) {
 function getQuestionnaire() {
     $result = [];
     $res = db_query("SELECT q.id, q.name, q.header, q.comment,
-      ql.id AS ql_id, ql.id_blank, ql.name AS ql_name, ql.type, ql.sort, ql.limits, ql.required
+      ql.id AS ql_id, ql.id_list, ql.name AS ql_name, ql.type, ql.sort, ql.limits, ql.required
       FROM questionnaire AS q
-      INNER JOIN questionnaire_list ql ON ql.id_blank = q.id
+      INNER JOIN questionnaire_list ql ON ql.id_list = q.id
       WHERE 1 ORDER BY ql.sort");
     while ($row = $res->fetch_assoc()) $result[] = $row;
     return $result;
@@ -44,14 +44,14 @@ function getIdTextField($id, $group=false) {
   $result = []; 
   $result2 = [];
   $values = [];
-  $res = db_query("SELECT `id`, `id_blank`, `name` FROM questionnaire_list WHERE `id_blank` = '$id' AND `type` = 'in' ORDER BY `id`");
+  $res = db_query("SELECT `id`, `id_list`, `name` FROM questionnaire_list WHERE `id_list` = '$id' AND `type` = 'in' ORDER BY `id`");
     
   while ($row = $res->fetch_assoc()) $result[$row['id']] = $row['name'];
 
   
 
   if ($group) {
-   $res3 = db_query("SELECT `id`, `id_blank`, `name` FROM questionnaire_list WHERE `id_blank` = '$id' AND `type` = 'ch' ORDER BY `id`");
+   $res3 = db_query("SELECT `id`, `id_list`, `name` FROM questionnaire_list WHERE `id_list` = '$id' AND `type` = 'ch' ORDER BY `id`");
   while ($row = $res3->fetch_assoc()) $result2[$row['id']] = $row['name'];
   }  
 
@@ -186,9 +186,7 @@ $value_group = getIdTextField($questionnaire_id, true);
                     <span class='visually-hidden'>$key</span>
                     <p id='textName'>{$value['Ваши фамилия и имя'][1]}</p>
                       <button type='button' class='delete_blank  btn btn-primary btn-close mb-4 'data-bs-toggle='modal' data-bs-target='#exampleModal'></button>
-            
                 </td>
-                
               </tr>
           </tbody>";
 
@@ -236,7 +234,6 @@ $value_group = getIdTextField($questionnaire_id, true);
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"> </button>
             </div>
             <div id="modal-text" class="modal-body-redact">
-                  
             </div>
             <div class="modal-footer">
               <button type='button'  class='yes_confirm  btn btn-primary'>ДА</button>
@@ -246,7 +243,6 @@ $value_group = getIdTextField($questionnaire_id, true);
         </div>
       </div>
 
-     
         <!-- Modal Очистить все анкеты форму-->
         <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
           <div class="modal-dialog">
@@ -281,7 +277,6 @@ $value_group = getIdTextField($questionnaire_id, true);
       .then(commits => {
 		  location.reload();
         /*if (commits) {			
-          
         }*/
       });
     }
@@ -291,15 +286,15 @@ $value_group = getIdTextField($questionnaire_id, true);
     if(evt) location.reload();
   })
 
-
   // удаляем одно поле либо всего пользователя
   $(".delete_field").click(function (evt) {
     const getParentButton = $(evt.currentTarget).parent();
     const getText = getParentButton[0].innerText;
-    const field = getText.split(':').slice(0,1);
+    const texrtField = getText.split('\n\n').slice(0,1);
     const forId = getText.split('\n\n')[1].split(' ').slice(0,1).join('');
     const forDate = getText.split(' ').slice(-2).join(' ');
-    $(".modal-body-redact").append(field);
+
+    $(".modal-body-redact").append(texrtField);
  
     $('.yes_confirm').click((evt)=>{
       if (evt) {
@@ -307,10 +302,8 @@ $value_group = getIdTextField($questionnaire_id, true);
       .then(
         response => response.text())
       .then(commits => {
-        console.log('forDate',commits);
          location.reload();
         /*if (commits) {			
-          
         }*/
       });
          }
@@ -319,11 +312,11 @@ $value_group = getIdTextField($questionnaire_id, true);
     
 // удаляем блок с фио
   $(".delete_blank").click(function (evt) {
-
     const getParentButton = $(evt.currentTarget).parent();
     const getText = getParentButton[0].innerText;
     const forDate = getText.split('\n\n').slice(0,1).join('');
     const forName = getText.split('\n\n').slice(-1).join('');
+
     $(".modal-body-redact").append(forName);
     
     $('.yes_confirm').click((evt)=>{
@@ -334,7 +327,6 @@ $value_group = getIdTextField($questionnaire_id, true);
         .then(commits => {
         location.reload();
           /*if (commits) {			
-            
           }*/
         });
       }

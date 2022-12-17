@@ -79,9 +79,9 @@ function getQuestionnaire() {
     $result = [];
     $condition = '1';    
     $res = db_query("SELECT q.id, q.name, q.header, q.comment,
-      ql.id AS ql_id, ql.id_blank, ql.name AS ql_name, ql.type, ql.sort, ql.limits, ql.required
+      ql.id AS ql_id, ql.id_list, ql.name AS ql_name, ql.type, ql.sort, ql.limits, ql.required
       FROM questionnaire AS q
-      INNER JOIN questionnaire_list ql ON ql.id_blank = q.id
+      INNER JOIN questionnaire_list ql ON ql.id_list = q.id
       WHERE $condition ORDER BY ql.sort");
     while ($row = $res->fetch_assoc()) $result[] = $row;
     return $result;
@@ -99,7 +99,7 @@ function getQuestionnaireByUser($dates=[]) {
     }    
 
     $res = db_query("SELECT qd.id, qd.id_list, qd.value, qd.date,
-      ql.id, ql.id_blank, ql.name
+      ql.id, ql.id_list, ql.name
       FROM questionnaire_data AS qd
       INNER JOIN questionnaire_list ql ON ql.id = qd.id_list
       WHERE $condition ORDER BY ql.id DESC");
@@ -229,7 +229,6 @@ $comment = $questionnaire[0]['comment'];
             ?>
             <h4>Спасибо</h4>
             <h6><a href="index.php">Вернуться к опросу.</h6>
-            <h6><a href="main.html">Вернуться на главную страницу.</h6>
         </div>
       <?php endif; ?>
       </div>
