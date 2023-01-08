@@ -1,10 +1,12 @@
 <?php
 include_once "apps/plugins/quiz/config.php";
 global $db;
-$id=$_POST['id'];
-$email=$_POST['email'];
-$password=$_POST['password'];
-$full_name=$_POST['full_name'];
+
+$id=isset($_POST['id'])?$_POST['id']:null;
+$email=isset($_POST['email'])?$_POST['email']:null;
+$password=isset($_POST['password'])?$_POST['password']:null;
+$full_name=isset($_POST['full_name'])?$_POST['full_name']:null;
+
 
 if(isset($_POST['email'])){
   $res = db_query( "INSERT INTO `users` ( `email`, `password`, `full_name`) VALUES ( '$email', '$password', '$full_name')");  

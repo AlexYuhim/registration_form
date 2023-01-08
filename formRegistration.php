@@ -2,10 +2,9 @@
 include_once "apps/plugins/quiz/config.php";
 
 global $db;
-$id=$_POST['id'];
-$email=$_POST['email'];
-
-$full_name=$_POST['full_name'];
+$id=isset($_POST['id'])?$_POST['id']:null;
+$email=isset($_POST['email'])?$_POST['email']:null;
+$full_name=isset($_POST['full_name'])?$_POST['full_name']:null;
 
 
 function addUser($email, $password, $full_name){
@@ -26,7 +25,7 @@ function getEmai($email){
 
 
 
-if($_POST['email'] && $_GET['type']){
+if($email && $_GET['type']){
   //проверка пароля
   
 if(strlen($_POST['password'])< 5)
@@ -48,7 +47,7 @@ else
 }
 ?>
 <?
-if($_GET['exit']==1)
+if(isset($_GET['exit'])==1)
     {
       unset($_SESSION['email']);
     }
