@@ -185,14 +185,9 @@ function allEvent() {
 <script>
 // получаем мероприятие при клике помещаем в модал окно
   $('.this_event').click((evt)=>{
-    console.log('evt.target.class',evt.target);
     $event_name = $(evt.currentTarget).find('.accordion-button')[0].innerText;
         $event_discription = $(evt.currentTarget).find('.accordion-body')[0].innerText;
         $event_id = $(evt.currentTarget).find('.event_id')[0].innerText;
-      
-        console.log('evt.currentTarget',$event_name);
-        console.log('evt.currentTarget',$event_discription);
-        console.log('evt.currentTarget',$event_id);
         $action="";
         $text_modal_body="";
     // Если кликнули на кнопку редактировать:
@@ -224,9 +219,7 @@ function allEvent() {
                       <div class=' overflow-auto border'><textarea  class="form-control" rows="5" name="discript_event">${$event_discription}</textarea></div>
                   </div>
                     </div>
-                  
               </div>
-                
             `)
           }
     })
@@ -234,11 +227,7 @@ function allEvent() {
   $('.modal_close').click(()=>{
     $('.modal-body').text('');
   })
-
-  $('#archive_event').change((evt)=>{
-
-  });
-  
+ 
 </script>
 </body>
 <!-- Конец dom -->

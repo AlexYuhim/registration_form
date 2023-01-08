@@ -77,7 +77,7 @@ $result = archiveEvent();
   <?require_once('header_nav.php')?>
 
                  <!-- начало адаптивной сетки -->
-                 <section class="all_event">
+<section class="all_event">
   <div class="container ">
     <div class="row">
       <div class="col-12 text-center">
@@ -86,7 +86,6 @@ $result = archiveEvent();
     </div>
     <div class="row text-center ">
       <?php
-       $counter=1;
         if($result){
           foreach($result as $number_event=>$event){
             $checked = '';
@@ -94,7 +93,7 @@ $result = archiveEvent();
               $checked = 'checked';
             }?>
                <!-- аккардион срат -->
-        <div class="this_event  border p-4 ml-2 mt-4 col-md-6 col-sm-12">
+        <div class="this_event border p-4 ml-2 mt-4 col-md-6 col-sm-12">
           <div >Мероприятие № <span><?=$event['id']?> </span></div>
           <div class="event_id visually-hidden" ><span><?=$event['id']?> </span></div>
             <div class="accordion m-3" id="accordion<?=$event['id']?>">
