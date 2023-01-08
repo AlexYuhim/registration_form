@@ -61,7 +61,7 @@ function deleteEvent($id){
 
 // выводим все не архивные мероприятия
 function allEvent() {
-  global $db;
+  
   $res = db_query("SELECT * FROM `event` WHERE `archive_event`='0'");
   while ($row = $res->fetch_assoc()) $result[] = $row;
   
@@ -168,7 +168,7 @@ function allEvent() {
           
 
           <div class="modal-body">
-            Следующее мероприятие будет изминено...
+          
           </div>
           
 
@@ -194,18 +194,21 @@ function allEvent() {
         console.log('evt.currentTarget',$event_discription);
         console.log('evt.currentTarget',$event_id);
         $action="";
+        $text_modal_body="";
     // Если кликнули на кнопку редактировать:
           if(evt.target.id === 'edit_event'){
             $action="edit";
+            $text_modal_body= 'Следующее мероприятие будет изминено'
           }
     // Если кликнули на кнопку удалить
           if(evt.target.id === 'delete_event'){
             $action="delete";
+            $text_modal_body= 'Следующее мероприятие будет удалено'
           }
-
             if(evt.target.id === 'edit_event' || evt.target.id === 'delete_event'){
           
             $('.modal-body').append(`
+                <h3 class='text-center'>${$text_modal_body}</h3>
                 <div class="container ">
                   <div class="row border mt-2">
                     <div class="col-12 text-center">
