@@ -1,10 +1,10 @@
-<?php
-    date_default_timezone_set ("Europe/Moscow");
+<?php session_start();
+date_default_timezone_set ("Europe/Moscow");
     //include_once 'logWriter.php';
-
     // establish mySQLi connection & database selection
     $host = $_SERVER['HTTP_HOST'];
-    $db = new mysqli('localhost', 'u0654_quize_dev' ,'%6X3jk8d4','u0654376_quize_develop');    
+    // $db = new mysqli('localhost', 'yuhim' ,'zZXx$050782','test');    
+    $db = new mysqli('localhost', 'u0654_quize_dev', '%6X3jk8d4', 'u0654376_quize_develop'); 
 
     // db query settings
     $db->set_charset('utf8');
